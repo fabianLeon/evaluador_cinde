@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-    <?php include_once 'templates/head.php'; ?>
-    <body ng-app="miEvaluador">
-        <?php include_once 'templates/header.php'; ?>
+    <?php include_once 'templates_admin/head.php'; ?>
+    <body ng-app="administrativo">
+        <?php include_once 'templates_admin/header.php'; ?>
         <div id="blue">
             <div class="container">
                 <div class="row">

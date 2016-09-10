@@ -140,7 +140,7 @@ evaluador.controller('inicio_sesion', function ($scope, $http) {
 
     ctrl.inicioSesion = function () {
         console.log('informacion');
-        data = {user: ctrl.codigo, password: ctrl.password};
+        data = {user: ctrl.codigo, password: ctrl.password, table:'estudiante'};
         $http.post('controller/session_start_controller.php', data).success(function (info) {
             swal({
                 title: 'Informacion de Acceso...!',

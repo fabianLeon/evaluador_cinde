@@ -11,8 +11,8 @@ $daoSession = new daoSession($dao);
 
 $data = json_decode(file_get_contents("php://input"));
 
-if( $daoSession->inicioSesion($data->{'user'},$data->{'password'})){
-    $result = $daoSession->inicioSesion($data->{'user'}, $data->{'password'});
+if( $daoSession->inicioSesion($data->{'user'},$data->{'password'},$data->{'table'})){
+    $result = $daoSession->inicioSesion($data->{'user'}, $data->{'password'},$data->{'table'});
     $_SESSION['user'] = $dao->strtoupper_utf8($result[0]);
     $_SESSION['k_estudiante'] = $data->{'user'};    
     echo ($_SESSION['user'].', Bienvenido Al Sistema Evaluador');
