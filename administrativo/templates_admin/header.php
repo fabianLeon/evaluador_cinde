@@ -14,17 +14,19 @@
             </button>
             <a class="navbar-brand" href="session_destroy.php">
                 <img src="../img/logo.png" class="img-responsive" style="max-width: 100px; margin-top: -25px">
+                Administrativo
             </a>
         </div>
         <div class="navbar-collapse collapse navbar-right">
             <ul class="nav navbar-nav">
                 <?php if ($_SESSION) { ?>
-                    <li><a href="pendiente.php">EVALUACIONES PENDIENTES</a></li>
+                    <li><a href="nueva_evaluacion.php">NUEVA EVALUACIÓN</a></li>
+                    <li><a href="asistencia.php">ASISTENCIA</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class='glyphicon glyphicon-user' aria-hidden='true'>
                             </span><?php echo(" " . $_SESSION['user']); ?> <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li><a href="session_destroy.php">CERRAR SESIÓN</a></li>
+                            <li><a href="../session_destroy.php">CERRAR SESIÓN</a></li>
                         </ul>
                     </li>
                 <?php } else { ?>

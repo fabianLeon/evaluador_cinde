@@ -4,7 +4,6 @@
 
 var admin = angular.module('administrativo', []);
 
-
 //--------------------------------------------------------------------------------
 //-------------------  Controlador lista asistencia  --------------------------
 admin.controller('lista_asistencia', function ($scope, $http) {
@@ -60,10 +59,37 @@ admin.controller('lista_asistencia', function ($scope, $http) {
                     'Su Lista de Asistencia Fue enviada Exitosamente',
                     'success'
                     );
+             window.locationf="asistencia.php";
         });
 
     };
 
+});
+
+//--------------------------------------------------------------------------------
+//-------------------  Controlador de inicio de sesion  --------------------------
+admin.controller('inicio_sesion', function ($scope, $http) {
+
+    var ctrl = this;
+    ctrl.info = '';
+    //ctrl.evaluacion = eval;
+
+    ctrl.inicioSesion = function () {
+        console.log('informacion');
+        data = {user: ctrl.codigo, password: ctrl.password, table: 'administrativo'};
+        $http.post('../controller/session_start_controller.php', data).success(function (info) {
+            swal({
+                title: 'Informacion de Acceso...!',
+                text: info,
+                timer: 1200
+            });
+            if (info !== 'El usuario o la contraseña no son correctas') {
+                setTimeout(function () {
+                    location.href = "asistencia.php";
+                }, 1500);
+            }
+        });
+    };
 });
 
 
@@ -131,63 +157,8 @@ admin.factory('eval', function () {
 });
 
 //--------------------------------------------------------------------------------
-//-------------------  Controlador de inicio de sesion  --------------------------
-admin.controller('inicio_sesion', function ($scope, $http) {
-
-    var ctrl = this;
-    ctrl.info = '';
-    //ctrl.evaluacion = eval;
-
-    ctrl.inicioSesion = function () {
-        console.log('informacion');
-        data = {user: ctrl.codigo, password: ctrl.password, table: 'administrativo'};
-        $http.post('../controller/session_start_controller.php', data).success(function (info) {
-            swal({
-                title: 'Informacion de Acceso...!',
-                text: info,
-                timer: 1200
-            });
-            if (info !== 'El usuario o la contraseña no son correctas') {
-                setTimeout(function () {
-                    location.href = "asistencia.php";
-                }, 1500);
-            }
-        });
-    };
-});
-
-//--------------------------------------------------------------------------------
-//---------------  Controlador de evaluaciones pendientes  -----------------------
-
-admin.controller('pendientes', function ($scope, $http, eval) {
-
-    var ctrl = this;
-    ctrl.msg = '';
-    ctrl.evaluacion = eval;
-    ctrl.evaluaciones_pendientes = [];
-    $http.get('controller/pendiente_controller.php').success(function (data) {
-        ctrl.evaluaciones_pendientes = data;
-        ctrl.msg = 'Evaluaciones Pendientes:  ' + data.length;
-    });
-
-    ctrl.evaluacion_pendiente = function (k_evalu, evalu, introduccion, t_grupo, profesor, grupo, encuentro, fecha, sesion) {
-        console.log(ctrl.evaluacion.objeto);
-        eval.objNuevo(k_evalu, evalu, introduccion, t_grupo, profesor, grupo, encuentro, fecha, sesion);
-
-        $http.get('controller/preguntas_controller.php?k_evaluacion=' + ctrl.evaluacion.objeto.k_evaluacion).success(function (preguntas) {
-            eval.cargar_preguntas(preguntas);
-        });
-
-        $http.get('controller/respuestas_controller.php?k_evaluacion=' + ctrl.evaluacion.objeto.k_evaluacion).success(function (respuestas) {
-            eval.cargar_respuestas(respuestas);
-        });
-
-    };
-
-});
-//--------------------------------------------------------------------------------
-//--------------------  Controlador de evaluaciones  -----------------------------
-admin.controller('controladorEvaluacion', function ($scope, $http, eval) {
+//--------------------  Controlador de vista previa evaluaciones  -----------------------------
+admin.controller('vista_evaluacion', function ($scope, $http, eval) {
     var ctrl = this;
     ctrl.evaluacion = eval;
 
@@ -255,5 +226,3 @@ admin.controller('controladorEvaluacion', function ($scope, $http, eval) {
 
 }
 );
-
-

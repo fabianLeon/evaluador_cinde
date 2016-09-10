@@ -59,13 +59,14 @@
                         </div>
                     </div>  
                 </div>
-                <div class="col-md-6" >
-                    <div class="panel panel-info">
-                        <div class="panel-body">
-                            <pre>{{ctrl.estudiantes| json}}</pre>
+                <!-- <div class="col-md-6" >
+                        <div class="panel panel-info">
+                            <div class="panel-body">
+                                <pre>{{ctrl.estudiantes| json}}</pre>
+                            </div>
                         </div>
                     </div>
-                </div>
+                -->
             </div>
         </div>
     </body>

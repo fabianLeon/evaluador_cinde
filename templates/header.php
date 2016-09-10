@@ -14,6 +14,7 @@
             </button>
             <a class="navbar-brand" href="session_destroy.php">
                 <img src="img/logo.png" class="img-responsive" style="max-width: 100px; margin-top: -25px">
+                Estudiante
             </a>
         </div>
         <div class="navbar-collapse collapse navbar-right">

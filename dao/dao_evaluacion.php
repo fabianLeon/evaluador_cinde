@@ -86,7 +86,7 @@ class daoEvaluacion {
                     . "('$estudiante',$sesion, evaluador.new_concepto('$respuesta'),$pregunta, $evaluacion,'$valor')";
             $result = $this->database->ejecutarConsulta($sql);
         }
-        $sql = "UPDATE evaluador.evaluacion_asistencia SET estado = 'OK' WHERE fk_sesion = $sesion and fk_estudiante like '$estudiante'";
+        $sql = "UPDATE evaluador.evaluacion_asistencia SET estado = 'OK' WHERE fk_sesion = $sesion and fk_estudiante like '$estudiante' and fk_evaluacion = $evaluacion";
         $result = $this->database->ejecutarConsulta($sql);
     }
 

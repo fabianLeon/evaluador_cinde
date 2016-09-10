@@ -12,7 +12,7 @@
         <div id="blue">
             <div class="container">
                 <div class="row">
-                    <h3>Inicio de Sesión.</h3>
+                    <h3>Inicio de Sesión. (Administrativo)</h3>
                 </div><!-- /row -->
             </div> <!-- /container -->
         </div><!-- /blue -->
