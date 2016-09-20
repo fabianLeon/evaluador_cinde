@@ -59,7 +59,7 @@ admin.controller('lista_asistencia', function ($scope, $http) {
                     'Su Lista de Asistencia Fue enviada Exitosamente',
                     'success'
                     );
-             window.locationf="asistencia.php";
+            window.locationf = "asistencia.php";
         });
 
     };
@@ -98,15 +98,24 @@ admin.controller('inicio_sesion', function ($scope, $http) {
 
 admin.factory('eval', function () {
     var servicio = {
-        nombre:'',
-        introduccion:'',
+        id_pregunta: 0,
+        nombre: '',
+        introduccion: '',
         preguntas: [],
         respuestas: [],
-        nueva_pregunta: function (pregunta) {
-            servicio.preguntas.push(pregunta);
+        nueva_pregunta: function (data) {
+            servicio.preguntas.push(data);
+            servicio.id_pregunta = servicio.id_pregunta + 1;
         },
         nueva_respuesta: function (respuesta) {
             servicio.respuestas.push(respuesta);
+        },
+        remove_pregunta: function (id) {
+            servicio.preguntas.splice(id - 1, 1);
+            for (var i = 0; i < $(servicio.preguntas).size(); i++) {
+                servicio.preguntas[i].id = i + 1;
+            }
+            servicio.id_pregunta--;
         }
     };
     return servicio;
@@ -114,69 +123,23 @@ admin.factory('eval', function () {
 
 //--------------------------------------------------------------------------------
 //--------------------  Controlador de form evaluacion ---------------------------
-admin.controller('vista_evaluacion', function ($scope, $http, eval) {
+admin.controller('formulario', function ($http, eval) {
     var ctrl = this;
     ctrl.evaluacion = eval;
+    ctrl.evaluacion.id_pregunta++;
 
-    ctrl.asignar_nuevo = function (id) {
-        var nuevo_concepto = $('#preg_' + id).val();
-        if (nuevo_concepto != '') {
-            eval.respuestas.push({pregunta: id, respuesta: nuevo_concepto, valor: 'LIKE', estado: 'new'});
-            $('#preg_' + id).val('');
-        }
-    };
-
-    ctrl.remove_resp = function (concepto) {
-        for (var i = 0; i < eval.respuestas.length; i++) {
-            if (eval.respuestas[i].respuesta === concepto) {
-                eval.respuestas.splice(i, 1);
-            }
-        }
-    };
-
-    ctrl.enviar = function () {
-        //window.location = "gracias.html";
-        ctrl.enviar_respuestas();
-
-    };
-    ctrl.enviar_respuestas = function () {
-        var respuestas = [];
-        var ra = 0;
-        var rc = 0;
-        respuestas.push(eval.objeto);
-        for (var i = 0; i < eval.respuestas.length; i++) {
-            if (eval.respuestas[i].valor !== null) {
-                respuestas.push(eval.respuestas[i]);
-                if (eval.respuestas[i].valor === 'SELECT') {
-                    rc++;
-                } else {
-                    ra++;
-                }
-            }
-        }
-
-        console.log('rc:' + rc + ',' + 'ra: ' + ra);
-        if (rc >= eval.cerradas && ra >= eval.abiertas) {
-            $http.post('controller/send_eval_controller.php', respuestas).success(function (data) {
-                window.location = "gracias.php";
-            });
-        } else {
+    ctrl.nueva_pregunta = function (tipo) {
+        if ($('#enunciado_abierta').val().length > 0){
+            ctrl.id++;
+            var resp = {enunciado: ctrl.enunciado, tipo: tipo, id: ctrl.evaluacion.id_pregunta};
+            ctrl.evaluacion.nueva_pregunta(resp);
+            ctrl.enunciado = '';
+        }else{
             swal({
                 title: 'Espera...!',
-                text: 'Aun no has terminado la evaluación.',
+                text: 'Debes añadir un enunciado para crear una pregunta.',
                 timer: 1000
             });
-        }
-
-        //-------------------------------------------------------------------------------------
-        //};
-    };
-
-    ctrl.limpiar = function (resp, id) {
-        for (var i = 0; i < eval.respuestas.length; i++) {
-            if (eval.respuestas[i].pregunta === id) {
-                eval.respuestas[i].valor = null;
-            }
         }
     };
 
@@ -185,71 +148,11 @@ admin.controller('vista_evaluacion', function ($scope, $http, eval) {
 
 //--------------------------------------------------------------------------------
 //--------------------  Controlador de vista previa evaluaciones  -----------------------------
-admin.controller('vista_evaluacion', function ($scope, $http, eval) {
+admin.controller('vista_evaluacion', function ($http, eval) {
     var ctrl = this;
     ctrl.evaluacion = eval;
-
-    ctrl.asignar_nuevo = function (id) {
-        var nuevo_concepto = $('#preg_' + id).val();
-        if (nuevo_concepto != '') {
-            eval.respuestas.push({pregunta: id, respuesta: nuevo_concepto, valor: 'LIKE', estado: 'new'});
-            $('#preg_' + id).val('');
-        }
+    ctrl.remover_pregunta = function (id) {
+        ctrl.evaluacion.remove_pregunta(id);
     };
-
-    ctrl.remove_resp = function (concepto) {
-        for (var i = 0; i < eval.respuestas.length; i++) {
-            if (eval.respuestas[i].respuesta === concepto) {
-                eval.respuestas.splice(i, 1);
-            }
-        }
-    };
-
-    ctrl.enviar = function () {
-        //window.location = "gracias.html";
-        ctrl.enviar_respuestas();
-
-    };
-    ctrl.enviar_respuestas = function () {
-        var respuestas = [];
-        var ra = 0;
-        var rc = 0;
-        respuestas.push(eval.objeto);
-        for (var i = 0; i < eval.respuestas.length; i++) {
-            if (eval.respuestas[i].valor !== null) {
-                respuestas.push(eval.respuestas[i]);
-                if (eval.respuestas[i].valor === 'SELECT') {
-                    rc++;
-                } else {
-                    ra++;
-                }
-            }
-        }
-
-        console.log('rc:' + rc + ',' + 'ra: ' + ra);
-        if (rc >= eval.cerradas && ra >= eval.abiertas) {
-            $http.post('controller/send_eval_controller.php', respuestas).success(function (data) {
-                window.location = "gracias.php";
-            });
-        } else {
-            swal({
-                title: 'Espera...!',
-                text: 'Aun no has terminado la evaluación.',
-                timer: 1000
-            });
-        }
-
-        //-------------------------------------------------------------------------------------
-        //};
-    };
-
-    ctrl.limpiar = function (resp, id) {
-        for (var i = 0; i < eval.respuestas.length; i++) {
-            if (eval.respuestas[i].pregunta === id) {
-                eval.respuestas[i].valor = null;
-            }
-        }
-    };
-
 }
 );

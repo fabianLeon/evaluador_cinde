@@ -69,8 +69,6 @@ class daoAsistencia {
         }
         $sql1 =   " UPDATE evaluador.sesion s SET s.ESTADO='PENDIENTE' WHERE s.pk_sesion = '$sesion'";
         $result = $this->database->ejecutarConsulta($sql1);
-        echo $sql.$result;
-        
+        echo $sql.$result;   
     }
-
 }

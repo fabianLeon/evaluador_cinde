@@ -19,55 +19,69 @@
         <!-- *****************************************************************************************************************
          CONTACT FORMS
          ***************************************************************************************************************** -->
-        <div class="container mtb" ng-controller="inicio_sesion as ctrl">
+        <div class="container mtb" >
             <div class="row">
                 <div class="col-lg-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="ctitle" style="text-align: center">Sistema de Evaluacion</h3>
-                            <h4 style="text-align: center">Bienvenido al sistema de evaluacion!</h4>
-                        </div>
-                        <div class="panel-body">
-                            <br>
-                            <form role="form" method="POST">
-                                <?php // if (isset($_GET['e'])) { ?>
-                                <h5 class="ctitle" style="text-align: center">{{ctrl.info}}</h5>
-                                <?php //} ?>
+                    <div ng-controller="formulario as ctrl">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <br>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" ng-model="ctrl.codigo" name="inputEmail" id="inputEmail" required="" placeholder="* Codigo Estudiante">
+                                    <label>Ingrese el Nombre de la evaluación</label>
+                                    <input type="text" class="form-control" ng-model="ctrl.evaluacion.nombre" name="nombre_evaluacion" id="nombre_evaluacion" required="" placeholder="* Nombre de la Evaluación" autocomplete="off">
                                 </div>
                                 <div class="form-group">
-                                    <input type="password" class="form-control" ng-model="ctrl.password" name="inputPassword" id="inputPassword" required="" placeholder="* Contraseña ">
+                                    <label>Ingrese la Introducción de la evaluación</label>
+                                    <textarea type="text" class="form-control" ng-model="ctrl.evaluacion.introduccion" name="introducción_evaluacion" id="introducción_evaluacion" required="" placeholder="* Introducción de la evaluación"autocomplete="off"></textarea>
                                 </div>
-                                <div style="text-align: center">
-                                    <button type="submit" class="btn btn-theme" ng-click="ctrl.inicioSesion()">Iniciar Sesión</button>
+                                <div class="panel panel-info">
+
+                                    <div class="panel-heading">Nueva Pregunta</div>
+                                    <div class="panel-body">
+
+                                        <div class="form-group">
+                                            <label>Ingrese el enunciado de la pregunta</label>
+                                            <textarea type="text" class="form-control" ng-model="ctrl.enunciado" name="enunciado_abierta" id="enunciado_abierta" required="" placeholder="* Enunciado" autocomplete="off"></textarea>
+                                        </div>     
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-info btn-xs" ng-click="ctrl.nueva_pregunta('A')">
+                                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Añadir Pregunta Abierta
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div align="right">
+                                                <button type="button" class="btn btn-info btn-xs" ng-click="ctrl.nueva_pregunta('C')">
+                                                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Añadir Pregunta Cerrada
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </form>
+
+                            </div>
                         </div>
                     </div>
                 </div><!--/col-lg-6 -->
-                
-                <div ng-controller="vista_evaluacion as ctrl">
 
-                <div class="col-md-9" >
-                    <div ng-if="ctrl.evaluacion.objeto.introduccion != ''">
+                <div ng-controller="vista_evaluacion as ctrl">
+                    <div class="col-md-6" >
                         <div class="panel panel-primary" >
-                            <div class="panel-heading" align="center"><h1>{{ctrl.evaluacion.objeto.evaluacion}}</h1></div>
+                            <div class="panel-heading" align="center"><h1>{{ctrl.evaluacion.nombre}}</h1></div>
                             <div class="panel-body">
                                 <div class="table-responsive">
                                     <table class="table table-striped">
                                         <tbody>
                                             <tr>
-                                                <th>{{ctrl.evaluacion.objeto.t_grupo}}</th>
+                                                <th>Linea/Seminario</th>
                                                 <th>Profesor </th>
                                                 <th>No. de Encuentro </th>
                                                 <th>Fecha </th>
                                             </tr>
                                             <tr>
-                                                <th>{{ctrl.evaluacion.objeto.grupo}}</th>
-                                                <th>{{ctrl.evaluacion.objeto.profesor}}</th>
-                                                <th>{{ctrl.evaluacion.objeto.encuentro}}</th>
-                                                <th>{{ctrl.evaluacion.objeto.fecha| date:'fullDate'}}</th>
+                                                <th> Nombre de la Sesión</th>
+                                                <th> Nombre del Profesor</th>
+                                                <th> #n </th>
+                                                <th>1 de Enero de 2016</th>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -75,13 +89,19 @@
                             </div>
 
                             <!Este es un Comentario>
-                            <div class="panel-heading">{{ctrl.evaluacion.objeto.introduccion}} </div>
+                            <div class="panel-heading">{{ctrl.evaluacion.introduccion}} </div>
                             <div class="panel-body">
 
                                 <div ng-repeat="pregunta in ctrl.evaluacion.preguntas">
 
                                     <div class="panel panel-primary" >
-                                        <div class="panel-heading">{{pregunta.q_orden}}. {{pregunta.n_enunciado}}</div>
+
+                                        <div class="panel-heading">{{pregunta.id}}. {{pregunta.enunciado}}
+                                            <button type="submit" class="btn btn-danger btn-xs" ng-click="ctrl.remover_pregunta(pregunta.id)">
+                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                            </button>
+                                        </div>
+
                                         <div ng-if="pregunta.tipo === 'A'">
                                             <div class="panel-body">
                                                 <div ng-repeat="respuesta in ctrl.evaluacion.respuestas">
@@ -157,13 +177,12 @@
                         </div>
                     </div>                   
                 </div>
-            </div>
             </div><!--/row -->
         </div><!--/container -->
         <!-- *****************************************************************************************************************
          FOOTER
          ***************************************************************************************************************** -->
-        <!-- <?php //include_once 'templates/footer.php';  ?> -->
+        <!-- <?php //include_once 'templates/footer.php';                       ?> -->
         <!-- Bootstrap core JavaScript
         ================================================== -->
         <!-- Placed at the end of the document so the pages load faster -->
