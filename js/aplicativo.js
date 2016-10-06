@@ -143,9 +143,8 @@ evaluador.controller('inicio_sesion', function ($scope, $http) {
         data = {user: ctrl.codigo, password: ctrl.password, table:'estudiante'};
         $http.post('controller/session_start_controller.php', data).success(function (info) {
             swal({
-                title: 'Informacion de Acceso...!',
-                text: info,
-                timer: 1200
+                title: 'Informacion de Acceso ...!',
+                text: info
             });
             if (info !== 'El usuario o la contraseña no son correctas') {
                 setTimeout(function () {
