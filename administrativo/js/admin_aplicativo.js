@@ -1,37 +1,85 @@
+//-----------------------------------------------------------------------------
+//------------------  HERRAMIENTA PARA GENERACION DE PDF  ---------------------
 
 ////------------------------------------------------------------------------------
 //---------------------- Mi aplicacion (miEvaluador) ---------------------------
 
 var admin = angular.module('administrativo', []);
-
 //--------------------------------------------------------------------------------
 //-------------------  Controlador lista asistencia  --------------------------
 admin.controller('lista_asistencia', function ($scope, $http) {
 
     var ctrl = this;
     ctrl.estudiantes = [];
+    ctrl.estudiantes_impresion = [];
     ctrl.sesion_actual = {};
     ctrl.sesion = 0;
     ctrl.i = 0;
+    console.log(ctrl.sesion_actual);
+    ctrl.fecha = new Date();
+    ctrl.get_fecha = function (now) {
+        var month = (now.getMonth() + 1);
+        var day = now.getDate();
+        if (month < 10)
+            month = "0" + month;
+        if (day < 10)
+            day = "0" + day;
+        var today = now.getFullYear() + '-' + month + '-' + day;
+        return today;
+    };
+    ctrl.get_sesiones = function () {
 
-    $http.get('../controller/asistencia_controller.php').success(function (data) {
-        console.log(data);
-        ctrl.sesiones = data;
-        ctrl.msg = 'Sesiones Pendientes:  ' + data.length;
-    });
+        $http.get('../controller/asistencia_controller.php?date=' + ctrl.get_fecha(ctrl.fecha)).success(function (data) {
+            console.log(data);
+            ctrl.sesiones = data;
+            ctrl.msg = 'Sesiones Pendientes:  ' + data.length;
+        });
+    };
     ctrl.asistencia = function (sesion) {
         for (var i = 0; i < ctrl.sesiones.lenght; i++) {
-            if (ctrl.sesiones[i].sesion === sesion) {
+            if (ctrl.sesiones[i].sesion === sesion.sesion) {
                 ctrl.sesion_actual = ctrl.sesiones[i];
             }
         }
         ctrl.sesion = sesion;
-        $http.get('../controller/estudiantes_asistencia_controller.php?k_sesion=' + sesion).success(function (estu) {
+        $http.get('../controller/estudiantes_asistencia_controller.php?k_sesion=' + sesion.sesion).success(function (estu) {
             ctrl.estudiantes = estu;
         });
+    };
+    ctrl.get_sesiones();
 
+    ctrl.get_estudiantes = function () {
+        for (var i = 1; i <= ctrl.estudiantes.length ; i++) {
+            ctrl.estudiantes_impresion = [''+i, ctrl.estudiantes.codigo, ctrl.estudiantes.nombre, '___________________']
+        }
     };
 
+    ctrl.generar_lista_asistencia = function () {
+        var lista = {
+            content: [
+                {
+                    table: {
+                        // headers are automatically repeated if the table spans over multiple pages
+                        // you can declare how many rows should be treated as headers
+                        headerRows: 1,
+                        widths: ['*', 'auto', 100, '*'],
+                        body: [
+                            ['#', 'Código', 'Nombres y apellidos', 'Firma'],
+                            ctrl.estudiantes_impresion,
+                            [{text: 'Bold value', bold: true}, 'Val 2', 'Val 3', 'Val 4']
+                        ]
+                    }
+                }
+            ]
+
+        };
+        return lista;
+    };
+    ctrl.guardar_lista = function () {
+        var lista = ctrl.generar_lista_asistencia();
+        var archivo = ctrl.sesion.profesor + '_' + ctrl.get_fecha(ctrl.fecha);
+        pdfMake.createPdf(lista).download(archivo);
+    };
     ctrl.enviar_asistencia = function () {
         swal({
             title: 'Enviar Lista de Asistencia',
@@ -58,15 +106,13 @@ admin.controller('lista_asistencia', function ($scope, $http) {
                     'Lista de Asistencia Enviada!',
                     'Su Lista de Asistencia Fue enviada Exitosamente',
                     'success'
-                ).then(function () {
+                    ).then(function () {
                 window.locationf = "asistencia.php";
             });
-             window.locationf = "asistencia.php";
+            window.locationf = "asistencia.php";
         });
     };
-
 });
-
 //--------------------------------------------------------------------------------
 //-------------------  Controlador de inicio de sesion  --------------------------
 admin.controller('inicio_sesion', function ($scope, $http) {
@@ -92,8 +138,6 @@ admin.controller('inicio_sesion', function ($scope, $http) {
         });
     };
 });
-
-
 //-----------------------------------------------------------------------------
 //--------------------------  Fabrica de Evalucion   --------------------------
 
@@ -121,14 +165,12 @@ admin.factory('eval', function () {
     };
     return servicio;
 });
-
 //--------------------------------------------------------------------------------
 //--------------------  Controlador de form evaluacion ---------------------------
 admin.controller('formulario', function ($http, eval) {
     var ctrl = this;
     ctrl.evaluacion = eval;
     ctrl.evaluacion.id_pregunta++;
-
     ctrl.nueva_pregunta = function (tipo) {
         if ($('#enunciado_abierta').val().length > 0) {
             ctrl.id++;
@@ -143,10 +185,8 @@ admin.controller('formulario', function ($http, eval) {
             });
         }
     };
-
 }
 );
-
 //--------------------------------------------------------------------------------
 //--------------------  Controlador de vista previa evaluaciones  -----------------------------
 admin.controller('vista_evaluacion', function ($http, eval) {

@@ -8,7 +8,7 @@ $dao = new dao(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 $dao->conectar();
 $daoAsistencia = new daoAsistencia($dao);
 session_start();
-
-$result = $daoAsistencia->consulta_session();
+$fecha = $_GET['date'];
+$result = $daoAsistencia->consulta_session($fecha);
 
 echo json_encode($result);

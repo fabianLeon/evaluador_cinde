@@ -16,7 +16,7 @@ class daoAsistencia {
         $this->database = $db;
     }
 
-    function consulta_session() {
+    function consulta_session($fecha) {
         $sql = "	
         SELECT          
                         tp.n_tipo_grupo t_grupo,
@@ -32,21 +32,22 @@ class daoAsistencia {
         WHERE		tp.pk_tipo_grupo = g.fk_tipo_grupo and
                         s.fk_profesor = p.pk_profesor and
                         s.fk_grupo = g.pk_grupo and
-                        s.d_sesion =  DATE(NOW()) and
+                        s.d_sesion = '$fecha' and
                         s.ESTADO LIKE 'LISTA'
                         group by grupo order by pk_sesion";
         //echo $sql;
+        
         $result = $this->database->ejecutarConsulta($sql);
         return ($this->database->transformarResultado2($result));
     }
 
-    function consulta_estudiantes($sesion) {
+    function consulta_estudiantes($sesion, $estado) {
         $sql = "
             SELECT      e.pk_estudiante codigo, concat(e.n_nombres,' ',e.n_apellido1,' ', e.n_apellido2) nombre
             FROM 	evaluador.estudiante e, evaluador.estudiante_cohorte_grupo ecg, 
                         evaluador.sesion s
             WHERE	s.pk_sesion = $sesion and
-                        ecg.fk_estado = 1 and
+                        ecg.fk_estado = $estado and
                         e.pk_estudiante = ecg.fk_estudiante and
                         s.fk_cohorte = ecg.fk_grupo_cohorte and
                         s.fk_grupo = ecg.fk_grupo and

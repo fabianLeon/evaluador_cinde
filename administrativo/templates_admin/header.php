@@ -20,6 +20,7 @@
         <div class="navbar-collapse collapse navbar-right">
             <ul class="nav navbar-nav">
                 <?php if ($_SESSION) { ?>
+                    <li><a href="reprogramar.php">PROGRAMACIONES</a></li>
                     <li><a href="nueva_evaluacion.php">NUEVA EVALUACIÓN</a></li>
                     <li><a href="asistencia.php">ASISTENCIA</a></li>
                     <li class="dropdown">

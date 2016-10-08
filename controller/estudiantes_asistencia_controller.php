@@ -10,6 +10,7 @@ $daoAsistencia = new daoAsistencia($dao);
 session_start();
 
 $sesion = $_GET['k_sesion'];
-$result = $daoAsistencia->consulta_estudiantes($sesion);
+$estado = 1;
+$result = $daoAsistencia->consulta_estudiantes($sesion, $estado);
 
 echo json_encode($result);

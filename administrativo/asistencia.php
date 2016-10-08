@@ -15,7 +15,7 @@
                     <ul class="nav nav-list">
                         <li class="nav-header">Sesiones </li>
                         <li ng-repeat="s in ctrl.sesiones" >
-                            <a href="#" ng-click="ctrl.asistencia(s.sesion)">
+                            <a href="#" ng-click="ctrl.asistencia(s)">
                                 {{s.t_grupo}}-{{s.grupo}},{{s.profesor}}
                             </a>
                         </li>
@@ -33,6 +33,7 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
+                                            <th>#</th>
                                             <th>ck</th>
                                             <th>Codigo </th>
                                             <th>Estudiante </th>
@@ -42,6 +43,7 @@
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="e in ctrl.estudiantes">
+                                            <th>{{$index+1}}</th>
                                             <th><input type ="checkbox" ng-model="e.check"></th>
                                             <th>{{e.codigo}}</th>
                                             <th>{{e.nombre}}</th>
