@@ -32,51 +32,76 @@
                 </div>
 
                 <div class="col-md-9" >
-                    <div class="panel-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <tbody>
-                                    <tr>
-                                        <th>{{ctrl.sesion.t_grupo +' '+ctrl.sesion.grupo}}</th>
-                                        <th>{{ctrl.sesion.profesor}}</th>
-                                        <th>{{ctrl.sesion.encuentro}}</th>
-                                        <th>{{ctrl.sesion.fecha| date:'fullDate'}}</th>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="panel panel-primary" >
+                        <div class="panel-heading" align="center"><h5>FECHA DE LA SESION ...</h5></div>
+
+                        <div class="panel-body">
+                            <div class="col-md-9" >
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            <tr>
+                                                <th>{{ctrl.sesion.fk_cohorte}}</th>
+                                                <th>{{ctrl.sesion.t_grupo + ' ' + ctrl.sesion.grupo}}</th>
+                                                <th>{{ctrl.sesion.profesor}}</th>
+                                                <th>{{ctrl.sesion.encuentro}}</th>
+                                                <th>{{ctrl.sesion.fecha| date:'fullDate'}}</th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-3" >
+                                <button type="submit" class="btn btn-theme" ng-click="ctrl.imprimir_lista()">
+                                    <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
+                                </button>
+
+                                <button type="submit" class="btn btn-theme" ng-click="ctrl.guardar_lista()">
+                                    <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+                                </button>
+
+                                <button type="submit" class="btn btn-theme" ng-click="ctrl.ver_lista()">
+                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                </button>
+                            </div>
                         </div>
+
                     </div>
                     <div class="panel panel-primary" >
-                        <div class="panel-heading" align="center"><h1>LISTADO</h1></div>
+                        <div class="panel-heading" align="center"><h5>LISTADO</h5></div>
                         <div class="panel-body">
                             <div class="table-responsive">
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>ck</th>
                                             <th>Codigo </th>
                                             <th>Estudiante </th>
-                                            <!-- <th>Hora llegada </th>
-                                            <th>Hora Salida </th> -->
+                                            <th>Programar </th>
+
+            <!-- <th>Hora llegada </th>
+            <th>Hora Salida </th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="e in ctrl.estudiantes">
-                                            <th>{{$index+1}}</th>
-                                            <th><input type ="checkbox" ng-model="e.check"></th>
+                                            <th>{{$index + 1}}</th>
                                             <th>{{e.codigo}}</th>
                                             <th>{{e.nombre}}</th>
+                                            <th>
+                                                <button type="submit" class="btn btn-theme btn btn-xs" ng-click="ctrl.reasignar(e.codigo)">
+                                                    <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+                                                </button>
+                                                 <button type="submit" class="btn btn-theme btn btn-xs" ng-click="ctrl.pendiente_reprogramacion(e.codigo)">
+                                                    <span class="glyphicon glyphicon-flag" aria-hidden="true"></span>
+                                                </button>
+                                            </th>
+                                           
                                             <!--<th><input ng-model="e.hora_ll" type=time min=8:00 max=17:00 step=900 value="08:00:00"></th>
                                             <th><input ng-model="e.hora_sa" type=time min=8:00 max=17:00 step=900 value="17:00:00"></th>-->
                                         </tr>
                                     </tbody>
                                 </table>
-                            </div>
-                        </div>
-                        <div class="panel-footer">
-                            <div style="text-align: center">
-                                <button type="submit" class="btn btn-theme" ng-click="ctrl.guardar_lista()">Guardar Lista</button>
                             </div>
                         </div>
                     </div>  

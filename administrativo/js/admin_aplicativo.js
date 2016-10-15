@@ -1,22 +1,30 @@
 //-----------------------------------------------------------------------------
 //------------------  HERRAMIENTA PARA GENERACION DE PDF  ---------------------
 
+
+
 ////------------------------------------------------------------------------------
 //---------------------- Mi aplicacion (miEvaluador) ---------------------------
 
 var admin = angular.module('administrativo', []);
 //--------------------------------------------------------------------------------
 //-------------------  Controlador lista asistencia  --------------------------
-admin.controller('lista_asistencia', function ($scope, $http) {
+admin.controller('lista_asistencia', function ($scope, $http, $filter) {
 
     var ctrl = this;
     ctrl.estudiantes = [];
+    ctrl.sesiones_disponibles = [];
     ctrl.estudiantes_impresion = [];
     ctrl.sesion_actual = {};
     ctrl.sesion = 0;
     ctrl.i = 0;
-    console.log(ctrl.sesion_actual);
     ctrl.fecha = new Date();
+        
+    ctrl.refresh = function(){
+        $window.location.reload();
+    };
+    
+    
     ctrl.get_fecha = function (now) {
         var month = (now.getMonth() + 1);
         var day = now.getDate();
@@ -30,47 +38,93 @@ admin.controller('lista_asistencia', function ($scope, $http) {
     ctrl.get_sesiones = function () {
 
         $http.get('../controller/asistencia_controller.php?date=' + ctrl.get_fecha(ctrl.fecha)).success(function (data) {
-            console.log(data);
             ctrl.sesiones = data;
             ctrl.msg = 'Sesiones Pendientes:  ' + data.length;
         });
     };
+
+    ctrl.get_sesiones_disponibles = function () {
+
+        $http.get('../controller/reprogramacion_disponibles_controller.php?grupo=' + ctrl.sesion.fk_grupo + '&fecha=' + ctrl.get_fecha(ctrl.fecha)).success(function (data) {
+            ctrl.sesiones_disponibles = data;
+        });
+    };
+    
+    ctrl.pendiente_reprogramacion = function (codigo){
+        $http.get('../controller/reprogramacion_disponibles_controller.php?'+
+                'grupo='+ ctrl.sesion.fk_grupo +
+                '&cohorte=' + ctrl.sesion.fk_cohorte +
+                '&estudiante='+ codigo +
+                '&profesor='+ctrl.sesion.profesor).success(function (data) {
+            ctrl.sesiones_disponibles = data;
+        });
+    };
+    
+    ctrl.reasignar = function (codigo) {        
+        console.log(codigo);
+    };
+
     ctrl.asistencia = function (sesion) {
         for (var i = 0; i < ctrl.sesiones.lenght; i++) {
             if (ctrl.sesiones[i].sesion === sesion.sesion) {
                 ctrl.sesion_actual = ctrl.sesiones[i];
+                
             }
         }
         ctrl.sesion = sesion;
         $http.get('../controller/estudiantes_asistencia_controller.php?k_sesion=' + sesion.sesion).success(function (estu) {
             ctrl.estudiantes = estu;
         });
+        ctrl.get_sesiones_disponibles();
     };
     ctrl.get_sesiones();
 
     ctrl.get_estudiantes = function () {
-        for (var i = 1; i <= ctrl.estudiantes.length ; i++) {
-            ctrl.estudiantes_impresion = [''+i, ctrl.estudiantes.codigo, ctrl.estudiantes.nombre, '___________________']
+        ctrl.estudiantes_impresion = [];
+        ctrl.estudiantes_impresion.push(['#', 'Código', 'Nombres y apellidos', 'Firma']);
+        for (var i = 0; i < ctrl.estudiantes.length; i++) {
+            ctrl.estudiantes_impresion.push(['' + (i + 1), ctrl.estudiantes[i][0], ctrl.estudiantes[i][1], '']);
         }
+        return ctrl.estudiantes_impresion;
+        
     };
 
     ctrl.generar_lista_asistencia = function () {
+        ctrl.get_estudiantes();
         var lista = {
+            pageSize: 'LETTER',
             content: [
                 {
+                    text: 'MAESTRÍA EN DESARROLLO EDUCATIVO Y SOCIAL\n' +
+                            'UPN ' + ctrl.sesion.fk_cohorte + ' - '
+                            + ctrl.sesion.t_grupo + ' ' + ctrl.sesion.grupo + '\n' +
+                            ctrl.sesion.profesor + '\n' +
+                            $filter('date')(ctrl.fecha, "fullDate") + '\n\n',
+                    style: 'header'
+                }
+                , {
                     table: {
+                        style: 'demoTable',
                         // headers are automatically repeated if the table spans over multiple pages
                         // you can declare how many rows should be treated as headers
                         headerRows: 1,
-                        widths: ['*', 'auto', 100, '*'],
-                        body: [
-                            ['#', 'Código', 'Nombres y apellidos', 'Firma'],
-                            ctrl.estudiantes_impresion,
-                            [{text: 'Bold value', bold: true}, 'Val 2', 'Val 3', 'Val 4']
-                        ]
+                        widths: [15, 70, 300, 100],
+                        body: ctrl.estudiantes_impresion
                     }
                 }
-            ]
+            ],
+            styles: {
+                header: {
+                    bold: true,
+                    color: '#000',
+                    fontSize: 14,
+                    alignment: 'center'
+                },
+                demoTable: {
+                    color: '#666',
+                    fontSize: 10
+                }
+            }
 
         };
         return lista;
@@ -79,6 +133,16 @@ admin.controller('lista_asistencia', function ($scope, $http) {
         var lista = ctrl.generar_lista_asistencia();
         var archivo = ctrl.sesion.profesor + '_' + ctrl.get_fecha(ctrl.fecha);
         pdfMake.createPdf(lista).download(archivo);
+    };
+    ctrl.imprimir_lista = function () {
+        var lista = ctrl.generar_lista_asistencia();
+        var archivo = ctrl.sesion.profesor + '_' + ctrl.get_fecha(ctrl.fecha);
+        pdfMake.createPdf(lista).print(archivo);
+    };
+    ctrl.ver_lista = function () {
+        var lista = ctrl.generar_lista_asistencia();
+        var archivo = ctrl.sesion.profesor + '_' + ctrl.get_fecha(ctrl.fecha);
+        pdfMake.createPdf(lista).open(archivo);
     };
     ctrl.enviar_asistencia = function () {
         swal({
@@ -98,9 +162,7 @@ admin.controller('lista_asistencia', function ($scope, $http) {
                     envio.push(ctrl.estudiantes[i]);
                 }
             }
-            console.log(envio);
             $http.post('../controller/llenar_asistencia_controller.php', envio).success(function (datos) {
-                console.log(datos);
             });
             swal(
                     'Lista de Asistencia Enviada!',
@@ -122,7 +184,6 @@ admin.controller('inicio_sesion', function ($scope, $http) {
     //ctrl.evaluacion = eval;
 
     ctrl.inicioSesion = function () {
-        console.log('informacion');
         data = {user: ctrl.codigo, password: ctrl.password, table: 'administrativo'};
         $http.post('../controller/session_start_controller.php', data).success(function (info) {
             swal({

@@ -18,13 +18,14 @@ class daoAsistencia {
 
     function consulta_session($fecha) {
         $sql = "	
-        SELECT          
+        SELECT          s.fk_grupo,
+                        s.fk_profesor,
                         tp.n_tipo_grupo t_grupo,
                         g.n_grupo grupo,
                         concat(p.n_nombres,' ',p.n_apellido1) profesor, 
                         s.d_sesion fecha,
                         s.q_encuentro encuentro,
-                        s.pk_sesion sesion
+                        s.pk_sesion sesion, s.fk_cohorte
         FROM		evaluador.grupo g, evaluador.profesor p,
                         evaluador.evaluacion e, evaluador.cohorte c,
                         evaluador.tipo_grupo tp,
@@ -34,9 +35,48 @@ class daoAsistencia {
                         s.fk_grupo = g.pk_grupo and
                         s.d_sesion = '$fecha' and
                         s.ESTADO LIKE 'LISTA'
-                        group by grupo order by pk_sesion";
+                        group by pk_sesion order by pk_sesion";
         //echo $sql;
-        
+
+        $result = $this->database->ejecutarConsulta($sql);
+        return ($this->database->transformarResultado2($result));
+    }
+    function set_estudiante_pendiente($grupo,$estudiante, $profesor, $cohorte){
+        $sql = "UPDATE evaluador.estudiante_cohorte_grupo SET
+                fk_estado = 3 
+                WHERE 
+                fk_estudiante= '$estudiante' and 
+                fk_grupo_cohorte = '$cohorte' and
+                fk_grupo='$grupo' and 
+                fk_profesor='$profesor' and 
+                fk_estado = 1";
+        $result = $this->database->ejecutarConsulta($sql);
+        return ($this->database->transformarResultado2($result));
+    }
+
+    function sesiones_disponibles($grupo, $fecha) {
+        $sql = "	
+        SELECT          s.fk_grupo,
+                        s.fk_profesor,
+                        tp.n_tipo_grupo t_grupo,
+                        g.n_grupo grupo,
+                        concat(p.n_nombres,' ',p.n_apellido1) profesor, 
+                        s.d_sesion fecha,
+                        s.q_encuentro encuentro,
+                        s.pk_sesion sesion, s.fk_cohorte
+        FROM		evaluador.grupo g, evaluador.profesor p,
+                        evaluador.evaluacion e, evaluador.cohorte c,
+                        evaluador.tipo_grupo tp,
+                        evaluador.sesion s
+        WHERE		tp.pk_tipo_grupo = g.fk_tipo_grupo and
+                        s.fk_profesor = p.pk_profesor and
+                        s.fk_grupo = g.pk_grupo and
+                        g.pk_grupo = $grupo and
+                        s.d_sesion > '$fecha' and
+                        s.ESTADO LIKE 'LISTA'
+                        group by pk_sesion order by fecha";
+        // echo $sql;
+
         $result = $this->database->ejecutarConsulta($sql);
         return ($this->database->transformarResultado2($result));
     }
@@ -60,16 +100,17 @@ class daoAsistencia {
     }
 
     function insertar_asistencia($data) {
-        $sesion = $data[0];   
-        $sql ='';
+        $sesion = $data[0];
+        $sql = '';
         $result = [];
         for ($i = 1; $i < count($data); $i ++) {
             $codigo = $data[$i]->{'codigo'};
-            $sql= "SELECT evaluador.new_evaluacion('$codigo',$sesion);";
+            $sql = "SELECT evaluador.new_evaluacion('$codigo',$sesion);";
             $result = $this->database->ejecutarConsulta($sql);
         }
-        $sql1 =   " UPDATE evaluador.sesion s SET s.ESTADO='PENDIENTE' WHERE s.pk_sesion = '$sesion'";
+        $sql1 = " UPDATE evaluador.sesion s SET s.ESTADO='PENDIENTE' WHERE s.pk_sesion = '$sesion'";
         $result = $this->database->ejecutarConsulta($sql1);
-        echo $sql.$result;   
+        echo $sql . $result;
     }
+
 }
