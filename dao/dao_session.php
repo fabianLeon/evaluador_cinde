@@ -16,8 +16,8 @@ class daoSession {
         $this->database = $db;
     }
 
-    function inicioSesion($estudiante,$pass,$table){
-        $sql = "select concat(n_nombres,' ',n_apellido1) from evaluador.$table where pk_$table like '$estudiante' and p_contrasena like '$pass'";
+    function inicioSesion($user,$pass,$table){
+        $sql = "select concat(n_nombres,' ',n_apellido1) from evaluador.$table where pk_$table like '$user' and p_contrasena like '$pass'";
         $result = $this->database->ejecutarConsulta($sql);
         return ($this->database->transformarResultado($result));
     }

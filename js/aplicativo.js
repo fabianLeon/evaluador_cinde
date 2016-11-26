@@ -4,69 +4,6 @@
 
 var evaluador = angular.module('miEvaluador', []);
 
-
-//--------------------------------------------------------------------------------
-//-------------------  Controlador lista asistencia  --------------------------
-evaluador.controller('lista_asistencia', function ($scope, $http) {
-
-    var ctrl = this;
-    ctrl.estudiantes =[];
-    ctrl.sesion_actual = {};
-    ctrl.sesion = 0;
-    ctrl.i = 0;
-
-    $http.get('controller/asistencia_controller.php').success(function (data) {
-        console.log(data);
-        ctrl.sesiones = data;
-        ctrl.msg = 'Sesiones Pendientes:  ' + data.length;
-    });
-    ctrl.asistencia = function (sesion) {
-        for (var i = 0; i < ctrl.sesiones.lenght; i++) {
-            if(ctrl.sesiones[i].sesion === sesion){
-                ctrl.sesion_actual = ctrl.sesiones[i];
-            }
-        }
-        ctrl.sesion = sesion;
-        $http.get('controller/estudiantes_asistencia_controller.php?k_sesion=' + sesion).success(function (estu) {
-            ctrl.estudiantes = estu;
-        });
-
-    };
-    
-    ctrl.enviar_asistencia = function(){
-        swal({
-            title: 'Enviar Lista de Asistencia',
-            text: "Este proceso es irreversible y no podra añadir otro estudiante!<br><br> Está Seguro que desea enviar ahora la lista de asistencia?",
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Si, Enviar',
-            cancelButtonText: 'Cancelar'
-        }).then(function () {
-            var envio= [];
-            envio.push(ctrl.sesion);
-            for (var i = 0; i < ctrl.estudiantes.length; i++) {
-                if(ctrl.estudiantes[i].check){
-                    envio.push(ctrl.estudiantes[i]);
-                }
-            }
-            console.log(envio);
-            $http.post('controller/llenar_asistencia_controller.php', envio).success(function (datos) {
-                console.log(datos);
-            });
-            swal(
-                'Lista de Asistencia Enviada!',
-                'Su Lista de Asistencia Fue enviada Exitosamente',
-                'success'
-            );
-        });
-        
-    };
-    
-});
-
-
 //-----------------------------------------------------------------------------
 //--------------------------  Fabrica de Evalucion   --------------------------
 
@@ -254,5 +191,3 @@ evaluador.controller('controladorEvaluacion', function ($scope, $http, eval) {
 
 }
 );
-
-

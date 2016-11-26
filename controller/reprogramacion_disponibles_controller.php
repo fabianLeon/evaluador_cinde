@@ -11,7 +11,8 @@ session_start();
 
 $grupo = $_GET['grupo'];
 $fecha = $_GET['fecha'];
+$hoy      = $_GET['hoy'];
 
-$result = $daoAsistencia->sesiones_disponibles($grupo, $fecha);
+$result = $daoAsistencia->sesiones_disponibles($grupo, $fecha, $hoy);
 
 echo json_encode($result);

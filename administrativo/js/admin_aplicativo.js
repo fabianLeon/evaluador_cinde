@@ -4,27 +4,74 @@
 
 
 ////------------------------------------------------------------------------------
-//---------------------- Mi aplicacion (miEvaluador) ---------------------------
+//---------------------- Mi aplicacion (administrativo) ---------------------------
 
 var admin = angular.module('administrativo', []);
 //--------------------------------------------------------------------------------
 //-------------------  Controlador lista asistencia  --------------------------
-admin.controller('lista_asistencia', function ($scope, $http, $filter) {
+admin.controller('lista_asistencia', function ($scope, $http, $filter, $window) {
+
 
     var ctrl = this;
+    ctrl.estudiante_reprogramar = null;
+    ctrl.e_reprogramar = {};
     ctrl.estudiantes = [];
     ctrl.sesiones_disponibles = [];
     ctrl.estudiantes_impresion = [];
     ctrl.sesion_actual = {};
     ctrl.sesion = 0;
     ctrl.i = 0;
+    ctrl.cambio;
+    ctrl.codigo = null;
     ctrl.fecha = new Date();
-        
-    ctrl.refresh = function(){
-        $window.location.reload();
+    ctrl.actualizar = function (codigo) {
+
+        ctrl.e_reprogramar = JSON.parse(ctrl.estudiante_reprogramar);
+        console.log(ctrl.e_reprogramar);
+        swal({
+            title: 'REPROGRAMAR',
+            text: "Está Seguro que desea reprogramar el estudiante con codigo " + ctrl.codigo + " a \n " +
+                    "Cohórte : \t" + ctrl.e_reprogramar.fk_cohorte + "\n" +
+                    ctrl.e_reprogramar.t_grupo + ": \t" + ctrl.e_reprogramar.grupo + "\n" +
+                    "Profesor(a) : \t" + ctrl.e_reprogramar.profesor + "\n" +
+                    "Fecha: \t" + ctrl.e_reprogramar.fecha,
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si',
+            cancelButtonText: 'Cancelar'
+        }).then(function () {
+
+            var cadena1 = '../controller/reprogramar_pendiente_controller.php?' +
+                    'cohorte_grupo_old=' + ctrl.sesion.fk_cohorte_grupo +
+                    '&estudiante=' + codigo +
+                    '&e=4';
+            console.log(cadena1);
+            $http.get(cadena1).success(function (data) {
+             console.log(data);
+            });
+
+            var cadena2 = '../controller/reprogramacion_controller.php?' +
+                    'cohorte_grupo_new=' + ctrl.e_reprogramar.fk_cohorte_grupo +
+                    '&estudiante=' + codigo +
+                    '&e=5';
+                      $http.get(cadena2).success(function (data) {
+                        console.log(data);
+                      });
+            console.log(cadena2);
+            swal({
+                text: 'El estudiante con código ' + codigo + ' cambió de grupo a'
+            }).then(function () {
+                ctrl.asistencia(ctrl.sesion);
+            });
+        });
+
+        ctrl.codigo = null;
+        ctrl.cambio = false;
+        ctrl.estudiante_reprogramar = null;
+
     };
-    
-    
     ctrl.get_fecha = function (now) {
         var month = (now.getMonth() + 1);
         var day = now.getDate();
@@ -38,6 +85,7 @@ admin.controller('lista_asistencia', function ($scope, $http, $filter) {
     ctrl.get_sesiones = function () {
 
         $http.get('../controller/asistencia_controller.php?date=' + ctrl.get_fecha(ctrl.fecha)).success(function (data) {
+            console.log(data);
             ctrl.sesiones = data;
             ctrl.msg = 'Sesiones Pendientes:  ' + data.length;
         });
@@ -45,39 +93,69 @@ admin.controller('lista_asistencia', function ($scope, $http, $filter) {
 
     ctrl.get_sesiones_disponibles = function () {
 
-        $http.get('../controller/reprogramacion_disponibles_controller.php?grupo=' + ctrl.sesion.fk_grupo + '&fecha=' + ctrl.get_fecha(ctrl.fecha)).success(function (data) {
+        $http.get('../controller/reprogramacion_disponibles_controller.php?grupo=' +
+                ctrl.sesion.fk_grupo + '&fecha=' + ctrl.get_fecha(ctrl.fecha) +
+                '&hoy=' + ctrl.get_fecha(new Date)).success(function (data) {
+                  console.log(data);
             ctrl.sesiones_disponibles = data;
         });
+
     };
-    
-    ctrl.pendiente_reprogramacion = function (codigo){
-        $http.get('../controller/reprogramacion_disponibles_controller.php?'+
-                'grupo='+ ctrl.sesion.fk_grupo +
-                '&cohorte=' + ctrl.sesion.fk_cohorte +
-                '&estudiante='+ codigo +
-                '&profesor='+ctrl.sesion.profesor).success(function (data) {
-            ctrl.sesiones_disponibles = data;
-        });
-    };
-    
-    ctrl.reasignar = function (codigo) {        
-        console.log(codigo);
+
+
+    ctrl.reasignar = function (codigo) {
+        ctrl.codigo = codigo;
+        ctrl.cambio = true;
     };
 
     ctrl.asistencia = function (sesion) {
         for (var i = 0; i < ctrl.sesiones.lenght; i++) {
             if (ctrl.sesiones[i].sesion === sesion.sesion) {
                 ctrl.sesion_actual = ctrl.sesiones[i];
-                
+
             }
         }
         ctrl.sesion = sesion;
         $http.get('../controller/estudiantes_asistencia_controller.php?k_sesion=' + sesion.sesion).success(function (estu) {
+            console.log(estu);
             ctrl.estudiantes = estu;
         });
         ctrl.get_sesiones_disponibles();
     };
     ctrl.get_sesiones();
+
+
+    ctrl.pendiente_reprogramacion = function (codigo) {
+
+        swal({
+            title: 'PENDIENTE POR REPROGRAMACIÓN',
+            text: "Está Seguro que desea cambiar el estado del estudiante?",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si',
+            cancelButtonText: 'Cancelar'
+        }).then(function () {
+            var cadena = '../controller/reprogramar_pendiente_controller.php?' +
+                    'cohorte_grupo_old=' + ctrl.sesion.fk_cohorte_grupo +
+                    '&estudiante=' + codigo +
+                    '&e=3';
+            console.log(cadena);
+            $http.get(cadena).success(function (data) {
+                console.log(data);
+            });
+            swal({
+                text: 'El estudiante con código ' + codigo + ' cambió su estado a ' +
+                        'PENDIENTE POR REPROGRAMACIÓN, no aparecerá más en esta lista'
+            }).then(function () {
+                ctrl.asistencia(ctrl.sesion);
+            });
+        });
+
+
+
+    };
 
     ctrl.get_estudiantes = function () {
         ctrl.estudiantes_impresion = [];
@@ -86,7 +164,7 @@ admin.controller('lista_asistencia', function ($scope, $http, $filter) {
             ctrl.estudiantes_impresion.push(['' + (i + 1), ctrl.estudiantes[i][0], ctrl.estudiantes[i][1], '']);
         }
         return ctrl.estudiantes_impresion;
-        
+
     };
 
     ctrl.generar_lista_asistencia = function () {
@@ -162,6 +240,7 @@ admin.controller('lista_asistencia', function ($scope, $http, $filter) {
                     envio.push(ctrl.estudiantes[i]);
                 }
             }
+            console.log(envio);
             $http.post('../controller/llenar_asistencia_controller.php', envio).success(function (datos) {
             });
             swal(
@@ -169,12 +248,13 @@ admin.controller('lista_asistencia', function ($scope, $http, $filter) {
                     'Su Lista de Asistencia Fue enviada Exitosamente',
                     'success'
                     ).then(function () {
-                window.locationf = "asistencia.php";
+                ctrl.get_sesiones();
             });
-            window.locationf = "asistencia.php";
         });
     };
-});
+
+
+});//--end controller lista_asistencia
 //--------------------------------------------------------------------------------
 //-------------------  Controlador de inicio de sesion  --------------------------
 admin.controller('inicio_sesion', function ($scope, $http) {

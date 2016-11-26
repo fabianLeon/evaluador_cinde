@@ -2,6 +2,13 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/var/www/html/evaluador_cinde/administrativo/nueva_evaluacion.php</file>
+            <file>file:/var/www/html/evaluador_cinde/dao/dao_asistencia.php</file>
+            <file>file:/var/www/html/evaluador_cinde/controller/estudiantes_asistencia_controller.php</file>
+            <file>file:/var/www/html/evaluador_cinde/controller/reprogramacion_controller.php</file>
+            <file>file:/var/www/html/evaluador_cinde/administrativo/js/admin_aplicativo.js</file>
+            <file>file:/var/www/html/evaluador_cinde/administrativo/reprogramar.php</file>
+        </group>
     </open-files>
 </project-private>

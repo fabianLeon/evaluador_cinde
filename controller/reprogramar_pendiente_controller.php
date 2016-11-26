@@ -9,11 +9,10 @@ $dao->conectar();
 $daoAsistencia = new daoAsistencia($dao);
 session_start();
 
-$grupo      = $_GET['grupo'];
-$estudiante = $_GET['estudiante'];
-$profesor   = $_GET['profesor'];
-$cohorte    = $_GET['cohorte'];
+$estudiante          = $_GET['estudiante'];
+$cohorte_grupo_old   = $_GET['cohorte_grupo_old'];
+$e   = $_GET['e'];
 
-$result = $daoAsistencia->set_estudiante_pendiente($grupo, $estudiante, $profesor, $cohorte);
+$result = $daoAsistencia->set_estudiante_pendiente($estudiante, $cohorte_grupo_old, $e);
 
 echo json_encode($result);

@@ -18,24 +18,25 @@ class daoEvaluacion {
 
     function consulta_pendientes($estudiante) {
         $sql = "
-        SELECT          tp.n_tipo_grupo t_grupo,
-                        g.n_grupo grupo,
-                        concat(p.n_nombres,' ',p.n_apellido1) profesor, 
-                        e.n_evaluacion evaluacion, 
-                        e.ln_introduccion introduccion, s.d_sesion fecha,s.q_encuentro encuentro,
-                        e.pk_evaluacion k_evaluacion, s.pk_sesion sesion
-        FROM		evaluador.grupo g, evaluador.profesor p,
-                        evaluador.evaluacion e, evaluador.cohorte c,
-                        evaluador.evaluacion_asistencia ea, evaluador.tipo_grupo tp,
-                        evaluador.sesion s
-        WHERE		ea.fk_evaluacion = e.pk_evaluacion and
-                        ea.fk_estudiante like '$estudiante' and
-                        tp.pk_tipo_grupo = g.fk_tipo_grupo and
-                        ea.fk_sesion = s.pk_sesion and
-                        s.fk_profesor = p.pk_profesor and
-                        s.fk_grupo = g.pk_grupo and
-                        ea.estado like	'PENDIENTE'
-        GROUP BY 	n_evaluacion";
+        SELECT      tp.n_tipo_grupo t_grupo,
+            				g.n_grupo grupo,
+            				concat(p.n_nombres,' ',p.n_apellido1) profesor,
+            				e.n_evaluacion evaluacion,
+            				e.ln_introduccion introduccion, s.d_sesion fecha,s.q_encuentro encuentro,
+            				e.pk_evaluacion k_evaluacion, s.pk_sesion sesion
+        FROM		    evaluador.grupo g, evaluador.profesor p,
+            				evaluador.evaluacion e, evaluador.cohorte c,
+            				evaluador.evaluacion_asistencia ea, evaluador.tipo_grupo tp,
+            				evaluador.sesion s, evaluador.cohorte_grupo cg
+        WHERE		    ea.fk_evaluacion = e.pk_evaluacion and
+            				ea.fk_estudiante like '$estudiante' and
+            				tp.pk_tipo_grupo = g.fk_tipo_grupo and
+            				ea.fk_sesion = s.pk_sesion and
+                    cg.pk_cohorte_grupo = s.fk_cohorte_grupo and
+            				cg.fk_profesor = p.pk_profesor and
+            				cg.fk_grupo = g.pk_grupo and
+            				ea.estado like	'PENDIENTE'
+        GROUP BY 	  n_evaluacion ";
         //echo $sql;
         $result = $this->database->ejecutarConsulta($sql);
 
@@ -43,7 +44,7 @@ class daoEvaluacion {
     }
 
     function consulta_preguntas($evaluacion) {
-        $sql = "select  p.* 
+        $sql = "select  p.*
                 from    evaluador.pregunta_evaluacion pe,
                         evaluador.pregunta p
                 where 	pe.fk_evaluacion = $evaluacion and
@@ -58,15 +59,15 @@ class daoEvaluacion {
 
     function consulta_respuestas($evaluacion) {
         $sql = "select  er.fk_descripcion respuesta, er.fk_pregunta pregunta,
-                        er.v_respuesta valor 
+                        er.v_respuesta valor
                 from 	evaluador.evaluacion_respuesta er,
-                        evaluador.pregunta p, 
+                        evaluador.pregunta p,
                         evaluador.respuesta r
                 where 	er.fk_evaluacion = $evaluacion and
                         er.fk_pregunta = p.pk_pregunta and
                         er.fk_descripcion like r.pk_descripcion and
                         r.estado like 'VIVO'
-                group by er.fk_pregunta, er.fk_descripcion 
+                group by er.fk_pregunta, er.fk_descripcion
                 order by pregunta,r.orden
                 ";
         //echo $sql;
@@ -80,7 +81,7 @@ class daoEvaluacion {
         $evaluacion = $data[0]->{'k_evaluacion'};
         for ($i = 1; $i < count($data); $i ++) {
             $respuesta = $data[$i]->{'respuesta'};
-            $pregunta = $data[$i]->{'pregunta'};    
+            $pregunta = $data[$i]->{'pregunta'};
             $valor = $data[$i]->{'valor'};
             $sql = "insert into evaluador.evaluacion_respuesta values "
                     . "('$estudiante',$sesion, evaluador.new_concepto('$respuesta'),$pregunta, $evaluacion,'$valor')";

@@ -9,8 +9,10 @@ $dao->conectar();
 $daoAsistencia = new daoAsistencia($dao);
 session_start();
 
-$sesion = $_GET['k_sesion'];
-$estado = 1;
-$result = $daoAsistencia->consulta_estudiantes($sesion, $estado);
+$estudiante           = $_GET['estudiante'];
+$cohorte_grupo_new    = $_GET['cohorte_grupo_new'];
+$e                    = $_GET['e'];
+
+$result = $daoAsistencia->reprogramacion($estudiante, $cohorte_grupo_new, $e);
 
 echo json_encode($result);

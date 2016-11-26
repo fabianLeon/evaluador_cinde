@@ -1,0 +1,56 @@
+-- MySQL dump 10.13  Distrib 5.7.13, for linux-glibc2.5 (x86_64)
+--
+-- Host: localhost    Database: evaluador
+-- ------------------------------------------------------
+-- Server version	5.6.34
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `sesion`
+--
+
+DROP TABLE IF EXISTS `sesion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sesion` (
+  `pk_sesion` int(11) NOT NULL AUTO_INCREMENT,
+  `d_sesion` date NOT NULL,
+  `q_encuentro` varchar(45) DEFAULT NULL,
+  `ESTADO` enum('LISTA','PENDIENTE','EVALUADA') DEFAULT 'LISTA',
+  `fk_cohorte_grupo` int(11) DEFAULT NULL,
+  PRIMARY KEY (`pk_sesion`),
+  KEY `fk_sesion_1_idx` (`fk_cohorte_grupo`),
+  CONSTRAINT `fk_sesion_1` FOREIGN KEY (`fk_cohorte_grupo`) REFERENCES `cohorte_grupo` (`pk_cohorte_grupo`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sesion`
+--
+
+LOCK TABLES `sesion` WRITE;
+/*!40000 ALTER TABLE `sesion` DISABLE KEYS */;
+INSERT INTO `sesion` VALUES (2,'2016-01-01','1','LISTA',1),(87,'2016-10-14','4','LISTA',2),(88,'2016-09-25','4','LISTA',3),(89,'2016-10-14','4','LISTA',4),(90,'2016-10-15','4','LISTA',5),(91,'2016-11-20','5','LISTA',6),(92,'2016-10-07','4','LISTA',7),(93,'2016-10-08','4','LISTA',8),(94,'2016-11-11','5','LISTA',9),(95,'2016-10-21','4','LISTA',10),(96,'2016-10-22','4','LISTA',11),(97,'2016-11-25','5','LISTA',12),(98,'2016-10-29','4','LISTA',13),(99,'2016-11-30','4','LISTA',14),(100,'2016-12-04','5','LISTA',15),(101,'2016-10-28','4','LISTA',16),(102,'2016-11-29','4','LISTA',17),(103,'2016-12-03','5','LISTA',18);
+/*!40000 ALTER TABLE `sesion` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-11-26 11:45:37
